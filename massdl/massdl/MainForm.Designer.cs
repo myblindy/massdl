@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.chkListen = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
             this.txtDownloadFolder = new System.Windows.Forms.TextBox();
@@ -98,6 +99,7 @@
             this.Controls.Add(this.txtDownloadFolder);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.chkListen);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Mass Downloader";

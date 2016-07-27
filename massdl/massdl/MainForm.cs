@@ -22,6 +22,8 @@ namespace massdl
         private const string ImgurClientSecret = "8780bf86f25ce7a08997227d3a6bedec49324515";
         private readonly ImgurClient ImgurClient = new ImgurClient(ImgurClientID, ImgurClientSecret);
 
+        private HashSet<string> Downloading = new HashSet<string>();
+
         public MainForm()
         {
             InitializeComponent();
@@ -37,11 +39,19 @@ namespace massdl
             if (!chkListen.Checked) return;
 
             var text = Clipboard.GetText();
-            var m = Regex.Match(text, @"imgur.com/a/([a-zA-Z0-9]+)$");
+            if (Downloading.Contains(text))
+            {
+                Log($"Already downloading {text}");
+                return;
+            }
+
+            var m = Regex.Match(text, @"imgur.com/a/([a-zA-Z0-9]+)(?:/all)?$");
             if (m.Success)
             {
                 // valid link, break it down
-                Log("Downloading album " + text);
+                Log($"Downloading album {text}");
+                Downloading.Add(text);
+
                 var endpoint = new AlbumEndpoint(ImgurClient);
                 var images = (await endpoint.GetAlbumImagesAsync(m.Groups[1].Value)).ToArray();
                 int idx = 0;
@@ -55,6 +65,7 @@ namespace massdl
                 }
 
                 Log("Finished downloading album " + text);
+                Downloading.Remove(text);
             }
         }
 
@@ -68,7 +79,12 @@ namespace massdl
                 }
         }
 
-        private void chkListen_CheckedChanged(object sender, EventArgs e) =>
+        private void chkListen_CheckedChanged(object sender, EventArgs e)
+        {
             txtDownloadFolder.Enabled = btnDownloadFolder.Enabled = !chkListen.Checked;
+
+            if (chkListen.Checked)
+                Directory.CreateDirectory(txtDownloadFolder.Text);
+        }
     }
 }
